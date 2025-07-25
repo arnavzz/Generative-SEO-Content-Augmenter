@@ -1,9 +1,7 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import netlify from "@netlify/vite-plugin";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import netlify from '@netlify/plugin-vite'
 
 export default defineConfig({
-  plugins: [react()],
-  plugins: [netlify()],
-  server: { port: 5173 }
-});
+  plugins: [react(), netlify()],
+})
