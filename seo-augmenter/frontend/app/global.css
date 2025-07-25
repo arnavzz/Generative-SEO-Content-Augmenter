@@ -1,9 +1,0 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* wrap long HTML code */
-.prose pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
