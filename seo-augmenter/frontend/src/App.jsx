@@ -6,14 +6,22 @@ import TakeawaysSection from './components/TakeawaysSection';
 import SourcesGrid from './components/SourcesGrid';
 import { parseSections } from './utils/parseSections';
 import aiAnalysis from '../images/ai-analysis.png'
-<img src={aiAnalysis} alt="AI Analysis" />
+
 
 import contentElements from '../images/content-elements.png'
-<img src={contentElements} alt="Content Elements" />
+
 import mythVsFact from '../images/myth-vs-fact.png'
 
 
-<img src={mythVsFact} alt="Myth vs Fact" />
+export default function App() {
+  return (
+    <div>
+      <img src={aiAnalysis} alt="AI Analysis" />
+      <img src={contentElements} alt="Content Elements" />
+      <img src={mythVsFact} alt="Myth vs Fact" />
+    </div>
+  )
+}
 
 export default function App() {
   const [keyword, setKeyword] = useState('');
