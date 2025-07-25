@@ -1,12 +1,12 @@
 export const metadata = {
-  title: "Generative SEO Content Augmenter",
-  description: "Keyword → Unique SEO blocks",
+  title: "SEO Content Augmenter",
+  description: "Generate FAQ, Myth vs Fact & Key Takeaways",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50 text-gray-800 antialiased">
+      <body className="bg-gray-50 text-gray-800 antialiased">
         {children}
       </body>
     </html>

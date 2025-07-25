@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Simple prose styling */
+/* wrap long HTML code */
 .prose pre {
   white-space: pre-wrap;
   word-wrap: break-word;
