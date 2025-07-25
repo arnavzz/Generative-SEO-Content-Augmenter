@@ -8,5 +8,3 @@
   port = 8888
   targetPort = 5173
   framework = "vite"
-[[plugins]]
-  package = "@netlify/plugin-vite"
