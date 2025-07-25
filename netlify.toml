@@ -1,21 +1,3 @@
-<<<<<<< HEAD
 [build]
-  base = "seo-augmentor/frontend"
-  publish = "dist"
   command = "npm run build"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-=======
-[build]
-  base = "seo-augmentor/frontend"
   publish = "dist"
-  command = "npm run build"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
->>>>>>> b5f24c6a67e3d952f4418c5cb668452f4d9a251d
