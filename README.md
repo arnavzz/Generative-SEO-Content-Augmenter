@@ -1,4 +1,3 @@
-Here is a complete and professional `README.md` tailored for GitHub:
 
 ---
 
