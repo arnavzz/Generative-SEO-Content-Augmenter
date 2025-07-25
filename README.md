@@ -79,7 +79,7 @@ Inspired by the growing demand for intelligent SEO tooling and powered by the la
 
 ## 🔗 Demo & Access
 
-🚧 _Live demo coming soon!_
+🚧 _Live demo : https://augai.netlify.app/
 
 
 
