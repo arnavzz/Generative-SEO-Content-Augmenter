@@ -1,76 +1,79 @@
 import { useState } from 'react';
-import KeywordForm from "./components/KeywordForm";
-import Output      from "./components/Output";
+import KeywordForm from './components/KeywordForm';
+import FaqSection from './components/FaqSection';
+import MythFactSection from './components/MythFactSection';
+import TakeawaysSection from './components/TakeawaysSection';
+import SourcesGrid from './components/SourcesGrid';
+import { parseSections } from './utils/parseSections';
 
 export default function App() {
-  const [html, setHtml] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const [sections, setSections] = useState([]);
   const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const generate = async (keyword) => {
+  const generate = async () => {
+    if (!keyword.trim()) return;
     setLoading(true);
     setError('');
-    setHtml('');
+    setSections([]);
     setSources([]);
-
     try {
       const res = await fetch(
         `http://localhost:8000/generate?keyword=${encodeURIComponent(keyword)}`
       );
       if (!res.ok) throw new Error(`Status ${res.status}`);
-      const data = await res.json();
-      setHtml(data.html || '');
-      setSources(data.sources || []);
+      const { html, sources } = await res.json();
+      setSections(parseSections(html));
+      setSources(sources || []);
     } catch (e) {
-      setError(e.message || 'Unknown error');
+      setError(e.message || 'Fetch failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4">
-      <h1 className="text-4xl font-bold mb-4">SEO Content Augmenter</h1>
-      <p className="text-gray-600 mb-8">
-        Enter a keyword to generate FAQ, Myth vs Fact & Key Takeaways
-      </p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <header className="p-8 text-center">
+        <h1 className="text-4xl font-bold text-primary">SEO Content Augmenter</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Enter a keyword to generate FAQ, Myth vs Fact, Key Takeaways & Sources
+        </p>
+        <KeywordForm
+          value={keyword}
+          onChange={setKeyword}
+          onSubmit={generate}
+          loading={loading}
+        />
+        {error && <p className="mt-4 text-red-600">{error}</p>}
+      </header>
 
-      <KeywordForm onSubmit={generate} disabled={loading} />
+      <main className="max-w-3xl mx-auto px-4 pb-12">
+        {sections.map((sec, idx) => {
+          const t = sec.title.toLowerCase();
+          if (t.includes('faq')) {
+            return <FaqSection key="faq" html={sec.content} />;
+          }
+          if (t.includes('myth')) {
+            return <MythFactSection key="myth" html={sec.content} />;
+          }
+          if (t.includes('takeaway')) {
+            return <TakeawaysSection key="takeaway" html={sec.content} />;
+          }
+          return null;
+        })}
 
-      {loading && (
-        <div className="mt-8 flex flex-col items-center text-blue-600">
-          <svg
-            className="animate-spin h-10 w-10"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            />
-          </svg>
-          <span className="mt-2">Generating content...</span>
-        </div>
-      )}
-
-      {error && (
-        <div className="mt-8 text-red-600 font-medium">
-          {error}
-        </div>
-      )}
-
-      {html && <Output html={html} sources={sources} />}
+        {sources.length > 0 && (
+          <>
+            <h2 className="text-2xl font-semibold mt-8 mb-4 flex items-center">
+              <span className="mr-2">🔗</span> Sources
+            </h2>
+            <SourcesGrid urls={sources} />
+          </>
+        )}
+      </main>
     </div>
   );
 }

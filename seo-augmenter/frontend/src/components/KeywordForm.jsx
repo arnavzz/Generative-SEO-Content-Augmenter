@@ -1,32 +1,22 @@
-import { useState } from 'react';
-
-export default function KeywordForm({ onSubmit, disabled }) {
-  const [keyword, setKeyword] = useState('');
-
+export default function KeywordForm({ value, onChange, onSubmit, loading }) {
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!keyword.trim()) return;
-        onSubmit(keyword.trim());
-      }}
-      className="w-full max-w-lg flex flex-col sm:flex-row gap-2"
-    >
+    <div className="mt-6 flex justify-center gap-3">
       <input
         type="text"
-        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        placeholder="eg: best running shoes"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        disabled={disabled}
+        className="px-4 py-2 rounded-l-lg border border-gray-300 dark:border-gray-600
+                   bg-white dark:bg-gray-800 focus:outline-none flex-1 max-w-md"
+        placeholder="e.g. best running shoes"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        disabled={loading}
       />
       <button
-        type="submit"
-        disabled={disabled}
-        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        onClick={onSubmit}
+        disabled={loading}
+        className="bg-accent text-white px-6 py-2 rounded-r-lg hover:bg-accent/90 disabled:opacity-50"
       >
-        {disabled ? '…' : 'Generate'}
+        {loading ? '…' : 'Generate'}
       </button>
-    </form>
+    </div>
   );
 }

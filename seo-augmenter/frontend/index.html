@@ -1,13 +1,561 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SEO Content Augmenter</title>
-    <link rel="stylesheet" href="/src/index.css" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>SEO Content Augmenter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter','sans-serif'] },
+          colors: { primary:'#3b82f6', accent:'#10b981' }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+      font-family:'Inter',sans-serif;
+      transition:background .3s,color .3s;
+      background:#f1f5f9;
+      color:#334155;
+    }
+    .dark body {
+      background:#0f172a; /* Darker background */
+      color:#e2e8f0;
+    }
+    .glass {
+      backdrop-filter:blur(16px);
+      background:rgba(255,255,255,0.4);
+      border:1px solid rgba(255,255,255,0.2);
+    }
+    .dark .glass {
+      background:rgba(30,41,59,0.5);
+      border:1px solid rgba(30,41,59,0.4);
+    }
+    .text-justify {
+      text-align:justify;
+    }
+    .pulse-glow {
+      animation: pulse-glow 3s ease-in-out infinite alternate;
+    }
+    @keyframes pulse-glow {
+      from { box-shadow: 0 0 25px rgba(59, 130, 246, 0.2); }
+      to { box-shadow: 0 0 40px rgba(16, 185, 129, 0.4); }
+    }
+    .faq-section {
+      margin-top: 1rem;
+    }
+    .faq-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border-left: 3px solid #3b82f6;
+      background: rgba(59, 130, 246, 0.05);
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+    .dark .faq-item {
+      background: rgba(59, 130, 246, 0.1);
+    }
+    .faq-item h3 {
+      color: #1e40af;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .dark .faq-item h3 {
+      color: #60a5fa;
+    }
+    .myth-fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .myth-fact-table th {
+      background: #3b82f6;
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+    .myth-fact-table td {
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    .dark .myth-fact-table td {
+      border-color: #334155;
+    }
+    .myth-fact-table tr:nth-child(even) {
+      background: rgba(59, 130, 246, 0.03);
+    }
+    .dark .myth-fact-table tr:nth-child(even) {
+      background: rgba(59, 130, 246, 0.1);
+    }
+    .key-insights {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .key-insights li {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+      border-radius: 0.5rem;
+      border-left: 4px solid #10b981;
+    }
+    .key-insights li strong {
+      color: #059669;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .dark .key-insights li strong {
+      color: #34d399;
+    }
+    .info-card {
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+        transform-style: preserve-3d;
+    }
+    .dark .info-card {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    .info-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- Dynamic Content Generation Logic (Existing) ---
+    const generateContent = (keyword) => {
+      const normalizedKeyword = keyword.toLowerCase().trim();
+      const faqTemplates = {
+        business: [
+          `How can small businesses effectively implement ${keyword} strategies on a limited budget?`,
+          `What are the most common ${keyword} mistakes that cost businesses money?`,
+          `How do you measure ROI when investing in ${keyword} initiatives?`,
+          `What's the typical timeline for seeing results from ${keyword} implementation?`
+        ],
+        technology: [
+          `What are the essential ${keyword} tools every professional should know?`,
+          `How do you ensure ${keyword} security and data privacy?`,
+          `What's the learning curve for mastering ${keyword} technologies?`,
+          `How does ${keyword} integrate with existing business systems?`
+        ],
+        marketing: [
+          `How can ${keyword} improve customer engagement and conversion rates?`,
+          `What are the best practices for ${keyword} campaign optimization?`,
+          `How do you track and analyze ${keyword} performance metrics?`,
+          `What budget allocation works best for ${keyword} initiatives?`
+        ]
+      };
+      const insights = [
+        `Establish clear ${keyword} objectives aligned with business goals before implementation.`,
+        `Invest in quality ${keyword} training and resources to maximize team effectiveness.`,
+        `Monitor ${keyword} performance metrics regularly and adjust strategies based on data insights.`,
+        `Stay updated with ${keyword} industry trends and best practices for competitive advantage.`,
+        `Build a sustainable ${keyword} framework that can scale with business growth.`
+      ];
+      const myths = [
+        { myth: `${keyword} delivers immediate results without ongoing effort`, fact: `Success with ${keyword} requires consistent effort, strategic planning, and continuous optimization over time.` },
+        { myth: `More expensive ${keyword} tools automatically guarantee better outcomes`, fact: `Tool effectiveness depends on proper implementation, user expertise, and alignment with specific business needs rather than price.` },
+        { myth: `${keyword} works the same way for all businesses and industries`, fact: `Effective ${keyword} strategies must be customized based on industry requirements, target audience, and business objectives.` }
+      ];
+      let category = 'business';
+      if (normalizedKeyword.includes('tech') || normalizedKeyword.includes('ai') || normalizedKeyword.includes('software') || normalizedKeyword.includes('digital')) category = 'technology';
+      else if (normalizedKeyword.includes('marketing') || normalizedKeyword.includes('seo') || normalizedKeyword.includes('social') || normalizedKeyword.includes('content')) category = 'marketing';
+      const selectedFAQs = faqTemplates[category];
+      const faqContent = `<h2>Interactive FAQ</h2><div class="faq-section">${selectedFAQs.map((question, index) => `<div class="faq-item"><h3>${question}</h3><p>${generateAnswer(question, keyword, index)}</p></div>`).join('')}</div>`;
+      const mythsContent = `<h2>Authoritative Myth vs Fact</h2><table class="myth-fact-table"><thead><tr><th>Widespread Myth</th><th>Strategic Reality</th></tr></thead><tbody>${myths.map(item => `<tr><td><strong>${item.myth}</strong></td><td>${item.fact}</td></tr>`).join('')}</tbody></table>`;
+      const insightsContent = `<h2>Actionable Key Insights</h2><ul class="key-insights">${insights.map(insight => `<li><strong>${insight.split(' ').slice(0, 3).join(' ')}:</strong> ${insight}</li>`).join('')}</ul>`;
+      const schemaContent = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": selectedFAQs.map(question => ({ "@type": "Question", "name": question, "acceptedAnswer": { "@type": "Answer", "text": generateAnswer(question, keyword, 0) } })) };
+      const sources = generateSources(keyword);
+      return { faq: faqContent, myths: mythsContent, insights: insightsContent, schema: JSON.stringify(schemaContent, null, 2), sources: sources };
+    };
+    const generateAnswer = (question, keyword, index) => {
+      const answers = [
+        `Start by conducting thorough research on ${keyword} best practices, set realistic budgets and timelines, focus on high-impact activities first, and leverage free or low-cost tools. Prioritize learning and gradual implementation over trying to do everything at once.`,
+        `Common pitfalls include lack of clear strategy, insufficient planning, ignoring data analytics, poor resource allocation, and unrealistic expectations. Success requires patience, consistent effort, and willingness to adapt based on results.`,
+        `Track key performance indicators specific to ${keyword}, calculate cost per acquisition, monitor conversion rates, and measure long-term customer value. Use analytics tools to attribute results accurately and adjust strategies based on performance data.`,
+        `Typically, initial results appear within 3-6 months, with significant improvements visible after 6-12 months of consistent implementation. Success depends on strategy complexity, resource allocation, and market conditions.`,
+        `Essential tools include analytics platforms, automation software, collaboration tools, and industry-specific applications. Focus on tools that integrate well with existing systems and provide actionable insights rather than just data collection.`,
+        `Implement robust security protocols, regular data backups, access controls, and compliance with relevant regulations. Stay updated on security best practices and conduct regular audits to identify potential vulnerabilities.`,
+        `Learning curves vary by individual background and complexity level. Generally, basic proficiency takes 2-3 months, intermediate skills develop over 6-12 months, and mastery requires 1-2 years of consistent practice and application.`,
+        `Modern ${keyword} solutions offer APIs and integration capabilities with most business systems. Plan integration carefully, test thoroughly, and ensure data consistency across platforms for optimal performance.`
+      ];
+      return answers[index % answers.length];
+    };
+    const generateSources = (keyword) => {
+      const domains = ['hubspot.com', 'neilpatel.com', 'moz.com', 'searchengineland.com', 'contentmarketinginstitute.com', 'socialmediaexaminer.com', 'marketingland.com', 'entrepreneur.com'];
+      return domains.slice(0, 5).map(domain => `https://www.${domain}/${keyword.toLowerCase().replace(/\s+/g, '-')}-guide`);
+    };
+
+    // --- UI Components (Existing & New) ---
+
+    function AnimatedSection({ children, className }) {
+        const ref = useRef();
+        useEffect(() => {
+            const observer = new IntersectionObserver(([entry]) => {
+                if (entry.isIntersecting) {
+                    ref.current.classList.remove('opacity-0', 'translate-y-8');
+                    observer.unobserve(ref.current);
+                }
+            }, { threshold: 0.1 });
+            if (ref.current) observer.observe(ref.current);
+            return () => {
+                if(ref.current) observer.unobserve(ref.current);
+            }
+        }, []);
+        return <div ref={ref} className={`opacity-0 translate-y-8 transition-all duration-1000 ease-out ${className || ''}`}>{children}</div>;
+    }
+
+    function StickyHeader() {
+        const [scrolled, setScrolled] = useState(false);
+        useEffect(() => {
+            const handleScroll = () => setScrolled(window.scrollY > 20);
+            window.addEventListener('scroll', handleScroll);
+            return () => window.removeEventListener('scroll', handleScroll);
+        }, []);
+        return (
+            <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'py-3 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-md' : 'py-5 bg-transparent'}`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                    <a href="#" className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">SEO Content Augmenter</a>
+                    <nav className="hidden md:flex items-center space-x-6">
+                        {['How It Works', 'Features', 'Use Cases', 'FAQs'].map(item => (
+                            <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-accent transition-colors">{item}</a>
+                        ))}
+                    </nav>
+                </div>
+            </header>
+        );
+    }
+
+    function NewHeroSection() {
+        return (
+            <div className="text-center pt-24 pb-16">
+                 <AnimatedSection>
+                    <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
+                        <span className="block">Transform Your Content Strategy</span>
+                        <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">with AI-Powered SEO Insights</span>
+                    </h1>
+                    <p className="max-w-3xl mx-auto mt-6 text-lg md:text-xl text-slate-600 dark:text-slate-300">
+                        Instantly elevate your existing blog posts by uncovering untapped user questions, debunking common myths, and gaining actionable insights tailored to outperform competitors.
+                    </p>
+                    <div className="mt-10">
+                        <a href="#generator" className="inline-block bg-primary text-white font-bold text-lg px-8 py-4 rounded-xl hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-primary/40">
+                            Try It Free Now
+                        </a>
+                    </div>
+                 </AnimatedSection>
+            </div>
+        );
+    }
+
+    function ProblemSection() {
+        const problems = [
+            "Spending hours analyzing search results without clear insights?",
+            "Frustrated by stale, repetitive content that doesn't engage readers?",
+            "Missing out on hidden SEO opportunities?"
+        ];
+        return (
+            <AnimatedSection className="py-16 text-center">
+                <h2 className="text-3xl font-bold mb-4">Are You Struggling to Outrank Competitors?</h2>
+                <div className="max-w-3xl mx-auto mt-8 grid gap-6">
+                    {problems.map((problem, i) => (
+                        <div key={i} className="info-card flex items-center p-4">
+                             <span className="text-3xl mr-4 text-red-500">❗️</span>
+                             <p className="text-lg text-left text-slate-700 dark:text-slate-200">{problem}</p>
+                        </div>
+                    ))}
+                </div>
+                <p className="mt-8 text-xl font-semibold text-slate-600 dark:text-slate-300">We solve these problems directly, enhancing your content with precision and depth.</p>
+            </AnimatedSection>
+        );
+    }
+
+    function HowItWorksSection() {
+        const steps = [
+            { icon: "⌨️", title: "Enter Your Keyword", desc: "Input your target keyword to begin." },
+            { icon: "🔬", title: "Real-Time Analysis", desc: "Our AI analyzes top-ranking articles to pinpoint content gaps and opportunities." },
+            { icon: "✨", title: "Receive Enhancements", desc: "Get tailored FAQ, Myth/Fact tables, and insights instantly." }
+        ];
+        return (
+            <section id="how-it-works" className="py-16 relative">
+                 <img src="./images/ai-analysis.png" alt="AI Analysis Background" className="absolute top-0 left-0 w-full h-full object-cover opacity-5 dark:opacity-10 pointer-events-none" />
+                <AnimatedSection className="text-center relative z-10">
+                    <h2 className="text-3xl font-bold mb-12">Powerful SEO Enhancements in Three Simple Steps</h2>
+                    <div className="grid md:grid-cols-3 gap-8 text-left">
+                        {steps.map((step, i) => (
+                            <div key={i} className="info-card">
+                                <span className="text-5xl mb-4 block">{step.icon}</span>
+                                <h3 className="text-xl font-bold mb-2 text-primary dark:text-blue-400">Step {i + 1}: {step.title}</h3>
+                                <p className="text-slate-600 dark:text-slate-300">{step.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </AnimatedSection>
+            </section>
+        );
+    }
+
+    function FeaturesSection() {
+        const features = [
+            { icon: "❓", title: "Interactive FAQ Generator", desc: "Automatically addresses genuine user questions ignored by competitors." },
+            { icon: "⚖️", title: "Myth vs Fact Authority Builder", desc: "Clearly debunks prevalent misinformation, building reader trust." },
+            { icon: "💡", title: "Actionable Key Insights", desc: "Provides immediate, high-impact strategies for content differentiation." },
+            { icon: "🔧", title: "SEO-Optimized FAQ Schema", desc: "Instantly enhances your SERP visibility with structured data." }
+        ];
+        return (
+            <section id="features" className="py-16 bg-slate-50 dark:bg-slate-800/50">
+                <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+                    <AnimatedSection>
+                        <h2 className="text-3xl font-bold mb-6">Features & Benefits</h2>
+                        <div className="space-y-6 text-left">
+                            {features.map((feature, i) => (
+                                <div key={i} className="flex items-start p-4 rounded-lg transition hover:bg-white dark:hover:bg-slate-700/50">
+                                    <span className="text-4xl mr-5 text-accent">{feature.icon}</span>
+                                    <div>
+                                        <h3 className="text-xl font-bold mb-1">{feature.title}</h3>
+                                        <p className="text-slate-600 dark:text-slate-300">{feature.desc}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </AnimatedSection>
+                     <AnimatedSection>
+                        <img src="./images/myth-vs-fact.png" alt="Myth vs Fact Graphic" className="rounded-xl shadow-2xl w-full h-auto object-cover"/>
+                     </AnimatedSection>
+                </div>
+            </section>
+        );
+    }
+
+    function DifferentiationSection() {
+        return (
+             <AnimatedSection className="py-20 text-center">
+                <h2 className="text-3xl font-bold mb-4">Why Choose Our SEO Augmenter?</h2>
+                <div className="max-w-4xl mx-auto">
+                    <p className="mt-6 text-xl text-slate-600 dark:text-slate-300 info-card p-8">
+                        Unlike generic content tools, we specifically target gaps in existing high-ranking content, empowering you to <strong className="text-primary dark:text-blue-400">strategically elevate</strong> your posts for both SEO and reader satisfaction.
+                    </p>
+                </div>
+            </AnimatedSection>
+        );
+    }
+
+    function UseCasesSection() {
+        const cases = [
+            { icon: "📝", title: "Content Marketers", desc: "Enhance existing blogs for maximum visibility." },
+            { icon: "🔍", title: "SEO Specialists", desc: "Quickly identify content gaps and opportunities." },
+            { icon: "📈", title: "Marketing Agencies", desc: "Provide competitive insights and improvements for clients." }
+        ];
+        return (
+             <section id="use-cases" className="py-16 bg-slate-50 dark:bg-slate-800/50">
+                 <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+                    <AnimatedSection>
+                         <img src="./images/content-elements.png" alt="Content Elements" className="rounded-xl shadow-2xl w-full h-auto object-cover"/>
+                    </AnimatedSection>
+                    <AnimatedSection className="text-left">
+                        <h2 className="text-3xl font-bold mb-6">Ideal for Digital Marketing Professionals</h2>
+                        <div className="space-y-6">
+                            {cases.map((useCase, i) => (
+                                <div key={i} className="info-card flex items-center p-4">
+                                    <span className="text-5xl mr-5">{useCase.icon}</span>
+                                    <div>
+                                        <h3 className="text-xl font-bold">{useCase.title}</h3>
+                                        <p className="text-slate-600 dark:text-slate-300">{useCase.desc}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </AnimatedSection>
+                 </div>
+            </section>
+        );
+    }
+
+    function ToolFaqSection() {
+        const faqs = [
+            { q: "Is it easy to integrate into my workflow?", a: "Absolutely! Copy-and-paste the HTML output directly into your content." },
+            { q: "How accurate are the insights?", a: "Our insights are based on real-time analysis of top-ranking articles, ensuring precise and relevant content enhancements." },
+            { q: "Can I use this for multiple keywords?", a: "Yes, the tool scales easily across all your SEO projects." },
+        ];
+        return(
+            <section id="faqs" className="py-16">
+                 <AnimatedSection className="text-center">
+                    <h2 className="text-3xl font-bold mb-12">Common Questions</h2>
+                    <div className="max-w-3xl mx-auto space-y-4 text-left">
+                        {faqs.map((faq, i) => (
+                            <details key={i} className="p-4 border-l-4 border-primary rounded-r-lg bg-slate-100 dark:bg-slate-800 cursor-pointer group">
+                                <summary className="font-semibold text-lg list-none flex justify-between items-center">
+                                    {faq.q}
+                                    <span className="transform transition-transform duration-300 group-open:rotate-45">+</span>
+                                </summary>
+                                <p className="mt-2 text-slate-600 dark:text-slate-300">{faq.a}</p>
+                            </details>
+                        ))}
+                    </div>
+                 </AnimatedSection>
+            </section>
+        );
+    }
+
+    function AppFooter() {
+        return (
+            <footer className="text-center py-12 border-t border-slate-200 dark:border-slate-800">
+                <p className="text-lg font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Powered by AI
+                </p>
+                <p className="text-sm text-slate-500 mt-2">© 2024 SEO Content Augmenter. All Rights Reserved.</p>
+            </footer>
+        )
+    }
+
+    function DarkToggle() {
+      const [dark, setDark] = useState(true);
+      useEffect(() => { document.documentElement.classList.toggle('dark', dark); }, [dark]);
+      return (
+        <button onClick={() => setDark(!dark)} className="fixed bottom-4 right-4 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:scale-110 transition-transform duration-200 z-50" title={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
+          <span className="text-xl">{dark ? '🌞' : '🌙'}</span>
+        </button>
+      );
+    }
+    function SchemaViewer({ schema }) {
+      const [copied, setCopied] = useState(false);
+      const copyToClipboard = () => { navigator.clipboard.writeText(schema).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }); };
+      return ( <div className="bg-gray-900 rounded-lg p-4 relative"> <button onClick={copyToClipboard} className="absolute top-2 right-2 bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary/80 transition-colors"> {copied ? 'Copied!' : 'Copy'} </button> <pre className="text-green-400 text-sm overflow-x-auto pt-8"><code>{schema}</code></pre> </div> );
+    }
+    function SectionCard({ icon, title, children }) {
+      const ref = useRef();
+      useEffect(() => { const obs = new IntersectionObserver(([e]) => { if(e.isIntersecting) { ref.current.classList.add('opacity-100', 'translate-y-0'); } }, { threshold: 0.1 }); if (ref.current) obs.observe(ref.current); return () => obs.disconnect(); }, []);
+      return ( <div ref={ref} className="opacity-0 translate-y-6 transition-all duration-700 ease-out glass rounded-2xl p-6 mb-8 hover:shadow-2xl transform hover:scale-[1.02] border-l-4 border-l-primary"> <h2 className="flex items-center text-2xl font-bold mb-6 text-primary"> <span className="mr-3 text-3xl">{icon}</span> {title} </h2> <div className="prose dark:prose-invert text-justify max-w-none">{children}</div> </div> );
+    }
+    function SourcesGrid({ urls, keyword }) {
+      const [data, setData] = useState([]);
+      useEffect(() => { const mockSources = urls.map((url, i) => { const domain = new URL(url).hostname.replace(/^www\./, ''); const titles = [`Complete Guide to ${keyword} Strategy Implementation`, `${keyword} Best Practices and Case Studies`, `Advanced ${keyword} Techniques for 2024`, `${keyword} ROI Optimization Strategies`, `Future Trends in ${keyword} Industry`]; const descriptions = [`Comprehensive overview of ${keyword} strategies and implementation techniques for modern businesses.`, `Expert insights and real-world case studies showcasing successful ${keyword} implementations.`, `Advanced techniques and emerging trends in ${keyword} that drive competitive advantage.`, `Data-driven approaches to maximize ROI from ${keyword} investments and initiatives.`, `Forward-looking analysis of ${keyword} trends and their impact on business growth.`]; return { url, title: titles[i % titles.length], desc: descriptions[i % descriptions.length], image: `https://picsum.photos/400/200?random=${keyword}${i}`, fav: `https://www.google.com/s2/favicons?domain=${domain}&sz=32`, site: domain }; }); setTimeout(() => setData(mockSources), 800); }, [urls, keyword]);
+      if (data.length === 0) { return ( <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6"> {[...Array(3)].map((_, i) => ( <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow animate-pulse"> <div className="w-full h-32 bg-gray-300 dark:bg-gray-600"></div> <div className="p-4"> <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div> <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div> <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded mb-1"></div> <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded mb-3 w-3/4"></div> <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div> </div> </div> ))} </div> ); }
+      return ( <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6"> {data.map((s, i) => ( <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-2xl transform hover:scale-[1.03] transition-all duration-300 border border-gray-200 dark:border-gray-700"> <img src={s.image} className="w-full h-32 object-cover" alt="" onError={(e) => { e.target.src = `https://via.placeholder.com/400x200/3b82f6/ffffff?text=${encodeURIComponent(s.site)}`; }}/> <div className="p-4"> <div className="flex items-center mb-2"> <img src={s.fav} className="w-5 h-5 mr-2 rounded" alt="" onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="%233b82f6"/></svg>'; }}/> <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">{s.site}</span> </div> <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">{s.title}</h3> <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-3">{s.desc}</p> <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-primary hover:text-primary/80 text-sm font-medium transition-colors">Read original <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg> </a> </div> </div> ))} </div> );
+    }
+    function LoadingAnimation({ keyword }) {
+      const [progress, setProgress] = useState(0); const [stage, setStage] = useState('Analyzing competitive landscape');
+      useEffect(() => { const stages = [`Analyzing ${keyword} competitive landscape`, `Identifying ${keyword} content gaps`, `Generating strategic FAQ content`, `Debunking industry myths`, `Creating actionable insights`, `Optimizing JSON-LD schema`]; const interval = setInterval(() => { setProgress(prev => { const newProgress = prev + 16.67; const stageIndex = Math.floor(newProgress / 16.67); if (stageIndex < stages.length) setStage(stages[stageIndex]); return newProgress > 100 ? 100 : newProgress; }); }, 400); return () => clearInterval(interval); }, [keyword]);
+      return ( <div className="glass rounded-2xl p-8 mb-8 text-center"> <div className="flex items-center justify-center mb-4"> <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div> <span className="font-medium">{stage}...</span> </div> <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2"> <div className="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300" style={{width: `${progress}%`}}></div> </div> <p className="text-sm text-gray-600 dark:text-gray-400">{Math.round(progress)}% Complete</p> </div> );
+    }
+
+    function App() {
+      const [kw, setKw] = useState('');
+      const [data, setData] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [err, setErr] = useState('');
+      const generate = () => { if (!kw.trim()) { setErr('Please enter a keyword'); return; } setLoading(true); setErr(''); setData(null); setTimeout(() => { try { const generatedContent = generateContent(kw); setData(generatedContent); } catch (error) { setErr('Failed to generate content. Please try again.'); } setLoading(false); }, 2500); };
+      const handleKeyPress = (e) => { if (e.key === 'Enter' && !loading) generate(); };
+      const suggestedKeywords = ['social media marketing', 'email marketing', 'content strategy', 'seo optimization', 'artificial intelligence', 'blockchain technology', 'e-commerce', 'customer service'];
+
+      return (
+        <>
+          <StickyHeader />
+          <DarkToggle />
+
+          <main className="pb-12 max-w-7xl mx-auto overflow-hidden">
+             {/* Subtle Animated Background Blobs */}
+             <div className="absolute top-0 left-0 w-full h-full pointer-events-none -z-10">
+                <div className="absolute top-1/4 left-10 w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-primary opacity-10 blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-1/4 right-10 w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-accent opacity-15 blur-3xl animate-pulse delay-150"></div>
+            </div>
+
+            <div className="px-4">
+                {/* New Informational Sections */}
+                <NewHeroSection />
+                <ProblemSection />
+            </div>
+
+            <HowItWorksSection />
+
+            <div className="px-4">
+                <FeaturesSection />
+                <DifferentiationSection />
+            </div>
+
+            <UseCasesSection />
+
+            <div className="px-4">
+                <ToolFaqSection />
+
+                {/* Generator Tool Section */}
+                <div id="generator" className="glass rounded-3xl p-8 my-12 text-center shadow-2xl pulse-glow scroll-mt-24">
+                  <div className="mb-6">
+                    <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
+                      Generate Your Content Now
+                    </h2>
+                    <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                      Enter a keyword to get comprehensive FAQ sections, myth vs fact tables, key insights, and curated sources to boost your content's SEO value.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-lg mx-auto mb-6">
+                    <input
+                      className="flex-1 px-6 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-lg"
+                      placeholder="e.g., content strategy"
+                      value={kw}
+                      onChange={e => setKw(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      disabled={loading}
+                    />
+                    <button
+                      onClick={generate}
+                      className="bg-gradient-to-r from-accent to-primary text-white px-8 py-3 rounded-xl hover:scale-105 active:scale-95 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg shadow-lg hover:shadow-xl"
+                      disabled={loading}
+                    >
+                      {loading ? ( <div className="flex items-center"> <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div> Generating... </div> ) : ( 'Generate Content' )}
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 justify-center mb-4">
+                    <span className="text-sm text-gray-500 dark:text-gray-400 mr-2">Try:</span>
+                    {suggestedKeywords.slice(0, 4).map(keyword => ( <button key={keyword} onClick={() => setKw(keyword)} className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20 transition-colors duration-200" disabled={loading}> {keyword} </button> ))}
+                  </div>
+                  {err && ( <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg"> <p className="text-red-700 dark:text-red-300">{err}</p> </div> )}
+                </div>
+
+                {loading && <LoadingAnimation keyword={kw} />}
+
+                {data && (
+                  <div className="mt-12">
+                    <SectionCard icon="❓" title="Frequently Asked Questions"><div dangerouslySetInnerHTML={{__html: data.faq}} /></SectionCard>
+                    <SectionCard icon="⚖️" title="Myth vs Fact"><div className="overflow-x-auto"><div dangerouslySetInnerHTML={{__html: data.myths}} /></div></SectionCard>
+                    <SectionCard icon="💡" title="Key Insights"><div dangerouslySetInnerHTML={{__html: data.insights}} /></SectionCard>
+                    <SectionCard icon="🔧" title="JSON-LD Schema"><SchemaViewer schema={data.schema} /></SectionCard>
+                    <div className="glass rounded-2xl p-6 border-l-4 border-l-accent">
+                      <h2 className="flex items-center text-2xl font-bold mb-6 text-accent"><span className="mr-3 text-3xl">🔗</span>Curated Sources</h2>
+                      <SourcesGrid urls={data.sources} keyword={kw} />
+                    </div>
+                  </div>
+                )}
+            </div>
+          </main>
+          <AppFooter />
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
 </html>
